@@ -1,5 +1,5 @@
 export default function WhatsAppCTA() {
-    const phoneNumber = "628198526632";
+    const phoneNumber = "6285198526632";
     const message = encodeURIComponent(
         "Halo, saya tertarik untuk melakukan reservasi di Loji Hotel Solo. Bisa dibantu informasinya?"
     );
