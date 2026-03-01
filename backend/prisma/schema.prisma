@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  type        String    // standard, deluxe, suite
+  price       Int       // price per night in IDR cents (e.g. 650000 = Rp 650.000)
+  priceUsd    Int       @default(0) // display price in USD
+  description String?
+  features    String[]
+  image       String?
+  rating      String    @default("4.7")
+  maxGuests   Int       @default(2)
+  totalRooms  Int       @default(5)
+  isActive    Boolean   @default(true)
+  bookings    Booking[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Booking {
+  id            String    @id @default(uuid())
+  bookingCode   String    @unique
+  roomId        Int
+  room          Room      @relation(fields: [roomId], references: [id])
+  guestName     String
+  guestEmail    String
+  guestPhone    String
+  checkIn       DateTime
+  checkOut      DateTime
+  nights        Int
+  guests        Int       @default(1)
+  totalPrice    Int       // in IDR
+  status        String    @default("pending") // pending, paid, cancelled, checked_in, checked_out
+  notes         String?
+  payment       Payment?
+  waNotifSent   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Payment {
+  id               String    @id @default(uuid())
+  bookingId        String    @unique
+  booking          Booking   @relation(fields: [bookingId], references: [id])
+  midtransOrderId  String    @unique
+  snapToken        String?
+  amount           Int
+  status           String    @default("pending") // pending, settlement, expire, cancel, deny
+  paymentType      String?
+  paidAt           DateTime?
+  midtransResponse Json?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
